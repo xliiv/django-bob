@@ -291,9 +291,26 @@ def bob_export_url(query, value, export_variable_name='export'):
     return query.urlencode()
 
 @register.simple_tag
-def dependency_data(form):
-    """Render the data-bob-dependencies tag if this is a DependencyForm"""
+def formset_dependency_data(formset):
+    """
+    Render the data-bob-dependencies tag dedicated to formset.
+    For regular form see: *dependency_data*
+    """
+    dependency_data = ''
+    formset_deps = []
+    if hasattr(formset, 'forms') and formset.forms:
+        for form in formset.forms:
+            prefix = '{}-'.format(form.prefix)
+            form_dep = form.get_dependencies_for_js(prefix)
+            formset_deps.extend(form_dep)
+    dependency_data = 'data-bob-dependencies="{0}"'.format(
+        esc(json.dumps(formset_deps))
+    )
+    return dependency_data
 
+@register.simple_tag
+def dependency_data(form, prefix=''):
+    """Render the data-bob-dependencies tag if this is a DependencyForm"""
     if not isinstance(form, DependencyForm):
         return ''
     return 'data-bob-dependencies="{0}"'.format(

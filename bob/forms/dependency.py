@@ -43,7 +43,7 @@ class DependencyForm(object): # Can't inherit Form due to metaclass conflict
         for dep in self.dependencies:
             if dep.met(cleaned_data):
                 if dep.action == REQUIRE:
-                    if not self.data.get(dep.slave):
+                    if cleaned_data.get(dep.slave) == '':
                         msg = 'This field is required'
                         self._errors[dep.slave] = self.error_class([msg])
             else:
@@ -60,9 +60,13 @@ class DependencyForm(object): # Can't inherit Form due to metaclass conflict
         return val
 
 
-    def get_dependencies_for_js(self):
+    def get_dependencies_for_js(self, name_prefix=''):
         """Return the dependencies in a format ready to be JSON serialized for
-        JavaScript"""
+        JavaScript.
+        If used with Django's formset, *formset.form.prefix* should be
+        passed as *name_prefix* arg.
+        """
+        prefix = lambda text: name_prefix + text
         result = []
         for dep in self.dependencies:
             if isinstance(dep.value, Container):
@@ -70,6 +74,6 @@ class DependencyForm(object): # Can't inherit Form due to metaclass conflict
             else:
                 value = self._format_single_val_for_js(dep.value)
             result.append({
-                'slave': dep.slave, 'master': dep.master,
+                'slave': prefix(dep.slave), 'master': prefix(dep.master),
                 'value': value, 'action': dep.action})
         return result

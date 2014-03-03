@@ -21,10 +21,13 @@
             }
             if (dep.action === "REQUIRE") {
                 master.change(function () {
+                    var label = $(slaveCtrl).find('label');
                     if (condition(master.val())) {
-                        $(slaveCtrl).find('label').addClass('required');
+                        $(label).addClass('required');
+                        $(slave).addClass('required');
                     } else {
-                        $(slaveCtrl).find('label').removeClass('required');
+                        $(label).removeClass('required');
+                        $(slave).removeClass('required');
                     }
                 });
             } else if (dep.action === "SHOW") {
