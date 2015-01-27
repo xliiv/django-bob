@@ -45,7 +45,7 @@ class DjidMeta(type):
             cls.init_from_dict(dict_, mount_column)
         meta.column_dict = column_dict
 
-        meta.additional_params = getattr(meta, 'additional_params', None)
+        meta.additional_params = getattr(meta, 'additional_params', {})
 
         try:
             cls.__registry__[meta.djid_id] = cls
@@ -185,7 +185,7 @@ class Djid(object):
                 column.get_csv_value(model)
                 for column in cls._meta.column_dict.values()
             ])
-        
+
         return buf.getvalue()
 
     @classmethod
@@ -196,7 +196,7 @@ class Djid(object):
             func=make_report,
             args=(cls, filtered_query_set.query, content_type),
             timeout=3000,
-        ) 
+        )
         return cls.get_status_response(job)
 
     @classmethod
@@ -212,7 +212,7 @@ class Djid(object):
             'job_id': job.id,
             'finished': job.result is not None,
             'exc_info': job.exc_info,
-        }), mimetype='application/json') 
+        }), mimetype='application/json')
 
     @classmethod
     def get_report(cls, request):
@@ -234,7 +234,7 @@ class Djid(object):
             'start_report': 'start_report',
             'update_status': 'update_status',
             'get_report': 'get_report'
-        }[action])(request) 
+        }[action])(request)
 
     @classmethod
     def resolver(cls):
@@ -289,6 +289,6 @@ def make_report(djid, query, content_type):
 
 
 
-#     
+#
 #     def get_response(self, request, djid, *args, **kwargs):
 #         return HttpResponse(data, content_type='text/csv')
